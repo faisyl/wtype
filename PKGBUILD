@@ -1,11 +1,10 @@
 # Maintainer: Faisal <faisal@kaosx.us>
-# Contributor: Faisal <faisal@kaosx.us>
-# Contributor: Daniel <daniel@foo.bar>
 
-pkgname=wtype
+pkgname=wtype-git
+_pkgname=wtype
 pkgver=0.4
 pkgrel=1
-pkgdesc="xdotool type for wayland"
+pkgdesc="xdotool type for wayland (git)"
 arch=('x86_64')
 url="https://github.com/faisyl/wtype"
 license=('MIT')
@@ -15,15 +14,23 @@ depends=(
     'libxkbcommon'
 )
 makedepends=(
+    'git'
     'meson'
     'ninja'
     'wayland'
 )
-source=("${pkgname}-${pkgver}.tar.gz::${url}/archive/v${pkgver}.tar.gz")
+provides=("${_pkgname}")
+conflicts=("${_pkgname}")
+source=("${_pkgname}::git+${url}.git")
 sha256sums=('SKIP')
 
+pkgver() {
+    cd "${srcdir}/${_pkgname}"
+    git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
 build() {
-    cd "${srcdir}/${pkgname}-${pkgver}"
+    cd "${srcdir}/${_pkgname}"
     meson setup . build \
         --prefix=/usr \
         --buildtype=release \
@@ -32,12 +39,12 @@ build() {
 }
 
 check() {
-    # No test suite upstream
+    cd "${srcdir}/${_pkgname}"
     :
 }
 
 package() {
-    cd "${srcdir}/${pkgname}-${pkgver}"
+    cd "${srcdir}/${_pkgname}"
     DESTDIR="${pkgdir}" ninja -C build install
 
     install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
