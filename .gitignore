@@ -52,3 +52,7 @@ Mkfile.old
 dkms.conf
 
 build/
+src/
+pkg/
+*.pkg.tar.zst
+*.tar.gz
